@@ -1,0 +1,212 @@
+<mat-card class="ad-wrapper" style="margin: 10px;">
+  <div style="margin-left: auto;">
+    <mat-card-header style="white-space: nowrap; margin-bottom: 10px">
+      <div style="margin-left: 5px; margin-bottom: 10px;">
+
+        <mat-button-toggle-group [(ngModel)]="selectedAction" (click)="getAction()" mat-raised-button color="primary"
+                                 appearance="legacy"
+                                 class="mat-button-toggle-group ng-valid ng-touched ng-dirty">
+          <mat-button-toggle value="N">
+            New Group
+          </mat-button-toggle>
+          <mat-button-toggle value="MR">
+            Merge Record
+          </mat-button-toggle>
+          <mat-button-toggle value="MG">
+            Merge Group
+          </mat-button-toggle>
+          <mat-button-toggle value="UPP">
+            Update Primary Profile
+          </mat-button-toggle>
+          <mat-button-toggle value="UR">
+            Ungroup Record
+          </mat-button-toggle>
+          <mat-button-toggle value="DG">
+            Dissolve Group
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+        <button mat-raised-button [disabled]="!submitflag"
+                (click)="submitBox()"
+                style="margin-left: 10px"
+                color="primary">
+          Submit
+        </button>
+        <!--      </div>-->
+        <!--    </mat-card-header>-->
+        <!--  </div>-->
+
+        <!--  <div style="margin-left: auto;">-->
+        <!--    <mat-card-header style="white-space: nowrap; margin-bottom: 10px">-->
+        <!--      <div style="margin-left: 5px;">-->
+        Non-Matched accounts and PRIMARY matched accounts
+        <button mat-raised-button (click)="getNonMatch()" style="margin-left: 5px" color="primary">
+          <mat-icon>search</mat-icon>
+          Search
+        </button>
+        Search all records
+        <button mat-raised-button (click)="searchAll()" style="margin-left: 5px" color="primary">
+          <mat-icon>search</mat-icon>
+          Search All
+        </button>
+      </div>
+      <div *ngIf="loadingPP">
+        <div style="text-align: center; font-weight: bold; margin-top: 20px;">
+          Updating Primary Profile
+          <div style="margin:20px -10px;">
+            <mat-progress-bar mode="buffer"></mat-progress-bar>
+          </div>
+        </div>
+      </div>
+      <div
+        style="background-color: whitesmoke; margin-left: 5px; margin-bottom: 10px; border-radius: 25px; outline: white; padding-left: 20px; outline-style: solid; outline-color: white">
+        <span [hidden]="!alertflag" style="float: right; margin-right: 15px; cursor: pointer;" class="material-icons"
+              (click)="onClose()">clear</span>
+        <h3>
+          <mat-icon [hidden]="!alertflag">info</mat-icon>
+          {{buttonHeader}}</h3>
+        <span style=" word-wrap: break-word; white-space: normal;
+        overflow-wrap: break-word;
+        width: 100%;"
+              [hidden]="!alertflag"> {{buttonText}}  </span>
+      </div>
+    </mat-card-header>
+  </div>
+  <mat-table matTableFilter [exampleEntity]="filterEntity"
+             [filterType]="filterType"
+             [dataSource]="accountMatchSource" md-autofocus class="mat-elevation-z8">
+    <ng-container matColumnDef="matchGroupID">
+      <mat-header-cell *matHeaderCellDef>
+        <mat-form-field style="width: 50% !important;">
+          <input matInput placeholder="Match Group ID" [(ngModel)]="filterEntity.MatchGroupID">
+          <button id="MatchGroupID" mat-button matSuffix mat-icon-button *ngIf="filterEntity.MatchGroupID" aria-label="Clear" (click)="clearMGFilter()">
+            <mat-icon matTooltip="Clear" aria-label="Clear" (click)="clearMGFilter()">close</mat-icon>
+          </button>
+        </mat-form-field>
+      </mat-header-cell>
+      <mat-cell *matCellDef="let accountMatch"> {{accountMatch.MatchGroupID}}
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="primaryProfile">
+      <mat-header-cell *matHeaderCellDef>
+        <mat-form-field style="width: 50% !important;">
+          <input matInput placeholder="Primary Profile" [(ngModel)]="filterEntity.PrimaryProfile">
+          <button id="PrimaryProfile" mat-button matSuffix mat-icon-button *ngIf="filterEntity.PrimaryProfile" aria-label="Clear" (click)="clearPPFilter()">
+            <mat-icon matTooltip="Clear" aria-label="Clear" (click)="clearPPFilter()">close</mat-icon>
+          </button>
+        </mat-form-field>
+      </mat-header-cell>
+      <mat-cell *matCellDef="let accountMatch"> {{accountMatch.PrimaryProfile}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="sourceSystemID">
+      <mat-header-cell *matHeaderCellDef>
+        <mat-form-field style="width: 70% !important;">
+          <input matInput placeholder="Source System ID" [(ngModel)]="filterEntity.SourceSystemID">
+          <button id="SourceSystemID" mat-button matSuffix mat-icon-button *ngIf="filterEntity.SourceSystemID" aria-label="Clear" (click)="clearSSFilter()">
+            <mat-icon matTooltip="Clear" aria-label="Clear" (click)="clearSSFilter()">close</mat-icon>
+          </button>
+        </mat-form-field>
+      </mat-header-cell>
+      <mat-cell *matCellDef="let accountMatch">{{accountMatch.SourceSystemID}}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="sourceSystem">
+      <mat-header-cell *matHeaderCellDef>Source System
+      </mat-header-cell>
+      <mat-cell
+        *matCellDef="let accountMatch"> {{accountMatch.SourceSystem}}   </mat-cell>
+    </ng-container>
+
+    <section class="checkbox-section">
+      <ng-container matColumnDef="primary">
+        <mat-header-cell style="flex: 0 0 50px !important;" *matHeaderCellDef>Primary
+        </mat-header-cell>
+        <mat-cell style="flex: 0 0 50px !important;" *matCellDef="let accountMatch">
+          <input type="checkbox" #checkboxes (change)="getPrimaryBox($event,accountMatch)" [disabled]="!selectedflag">
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="select">
+        <mat-header-cell style="flex: 0 0 50px !important;" *matHeaderCellDef>Match Group
+        </mat-header-cell>
+        <mat-cell *matCellDef="let accountMatch" style="flex: 0 0 50px !important;">
+          <input type="checkbox" #checkboxes (change)="getSelectedBox($event,accountMatch)" [disabled]="!primaryflag">
+        </mat-cell>
+      </ng-container>
+    </section>
+
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef>
+        <mat-form-field style="width: 100% !important;">
+          <input matInput placeholder="Account Name" [(ngModel)]="filterEntity.AccountName">
+          <button id="accountMatchFilter" mat-button matSuffix mat-icon-button *ngIf="filterEntity.AccountName" aria-label="Clear" (click)="clearANFilter()">
+            <mat-icon matTooltip="Clear" aria-label="Clear" (click)="clearANFilter()">close</mat-icon>
+          </button>
+        </mat-form-field>
+      </mat-header-cell>
+      <mat-cell *matCellDef="let accountMatch"> {{accountMatch.AccountName}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="state">
+      <mat-header-cell *matHeaderCellDef style="flex: 0 0 40px !important; margin-left: 40px;">
+        State
+      </mat-header-cell>
+      <mat-cell style="flex: 0 0 40px !important; margin-left: 40px;"
+                *matCellDef="let accountMatch"> {{accountMatch.State}}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="city">
+      <mat-header-cell *matHeaderCellDef >
+        <mat-form-field style="width: 50% !important;">
+          <input matInput placeholder="City" [(ngModel)]="filterEntity.City">
+          <button id="City" mat-button matSuffix mat-icon-button *ngIf="filterEntity.City" aria-label="Clear" (click)="clearCFilter()">
+            <mat-icon matTooltip="Clear" aria-label="Clear" (click)="clearCFilter()">close</mat-icon>
+          </button>
+        </mat-form-field>
+      </mat-header-cell>
+      <mat-cell *matCellDef="let accountMatch">{{accountMatch.City}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="address1">
+      <mat-header-cell *matHeaderCellDef>
+        <mat-form-field style="width: 100% !important;">
+          <input matInput placeholder="Address Line 1" [(ngModel)]="filterEntity.AddressLine1">
+          <button id="AddressLine1" mat-button matSuffix mat-icon-button *ngIf="filterEntity.AddressLine1" aria-label="Clear" (click)="clearA1Filter()">
+            <mat-icon matTooltip="Clear" aria-label="Clear" (click)="clearA1Filter()">close</mat-icon>
+          </button>
+        </mat-form-field>
+      </mat-header-cell>
+      <mat-cell *matCellDef="let accountMatch">{{accountMatch.AddressLine1}}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="address2">
+      <mat-header-cell style="padding-right: 5px; padding-left: 5px;" *matHeaderCellDef>Address Line 2
+      </mat-header-cell>
+      <mat-cell *matCellDef="let accountMatch"> {{accountMatch.AddressLine2}}   </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="created">
+      <mat-header-cell *matHeaderCellDef>Created</mat-header-cell>
+      <mat-cell *matCellDef="let accountMatch">
+        {{accountMatch.dtCreated | date: 'short'}}
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="accountMatchColumns"></mat-header-row>
+    <mat-row *matRowDef="let accountMatch; columns: accountMatchColumns;"></mat-row>
+  </mat-table>
+
+  <div *ngIf="loading">
+    <div style="text-align: center; font-weight: bold; margin-top: 20px;">
+      Retrieving Data
+      <div style="margin:20px -10px;">
+        <mat-progress-bar mode="buffer"></mat-progress-bar>
+      </div>
+    </div>
+  </div>
+
+  <mat-paginator [pageSizeOptions]="[20, 50, 100, 500]"></mat-paginator>
+
+
+</mat-card>

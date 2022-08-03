@@ -1,0 +1,191 @@
+import {Component, Input, NgZone, OnInit, SimpleChange, ViewChild} from '@angular/core';
+import {HttpService} from "../../http.service";
+import {DataService} from "../../data.service";
+import {MatSort} from '@angular/material/sort';
+import {MatPaginator} from "@angular/material/paginator";
+import {MatTableDataSource} from "@angular/material/table";
+import {ConfirmChangesComponent} from "../../dialogs/confirm-changes/confirm-changes.component";
+import {MatDialog} from "@angular/material/dialog";
+import {FormControl} from '@angular/forms';
+import {first, Observable} from "rxjs";
+
+export class AccountMatchData {
+  name: string;
+  city: string;
+  address1: string;
+}
+
+@Component({
+  selector: 'app-account-match',
+  templateUrl: './account-match.component.html',
+  styleUrls: ['./account-match.component.css']
+})
+
+export class AccountMatchComponent implements OnInit {
+
+  @Input() io: any;
+  @Input() socketConnected: any;
+  @ViewChild(MatSort, {static: true}) sort: MatSort;
+  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+
+  // accountMatchColumns = ['matchGroupID',  'primaryProfile', 'id', 'sourceSystem','name', 'address',  'created'];
+  ////////////////////////////////////////////////////
+  nameFilter = new FormControl('');
+  address1Filter = new FormControl('');
+  cityFilter = new FormControl('');
+  dataSource = new MatTableDataSource();
+  array: [];
+  public accountMatch;
+  loading = false;
+  accountMatchColumns = ['primary', 'select', 'matchGroupID', 'primaryProfile',  'sourceSystem', 'sourceSystemField', 'name', 'state', 'city', 'address1', 'address2', 'created'];
+  //columnsToDisplay = ['primary', 'select', 'matchGroupID', 'primaryProfile', 'id', 'sourceSystem','sourceSystemField','name', 'address1', 'city'];
+
+  filterValues = {
+    AccountName: '',
+    AddressLine1: '',
+    City: ''
+  };
+
+  accountMatchSource: MatTableDataSource<AccountMatchData>;
+  accountMatchFilter = '';
+
+  constructor(
+    private zone: NgZone,
+    private httpService: HttpService,
+    private dataService: DataService,
+    private dialog: MatDialog,
+  ) {
+    console.log('Called Constructor');
+    this.get();
+    this.dataSource.filterPredicate = this.createFilter();
+  }
+
+
+  ngOnInit() {
+
+    console.log('Called ngOnInit method');
+    this.loading = true;
+    this.nameFilter.valueChanges
+      .subscribe(
+        AccountName => {
+          this.filterValues.AccountName = AccountName;
+          this.dataSource.filter = JSON.stringify(this.filterValues);
+        }
+      )
+
+    this.address1Filter.valueChanges
+      .subscribe(
+        AddressLine1 => {
+          this.filterValues.AddressLine1 = AddressLine1;
+          this.dataSource.filter = JSON.stringify(this.filterValues);
+        }
+      )
+
+    this.cityFilter.valueChanges
+      .subscribe(
+        City => {
+          this.filterValues.City = City;
+          this.dataSource.filter = JSON.stringify(this.filterValues);
+        }
+      )
+  }
+
+  ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
+    if (changes['io']) this.io = changes['io'].currentValue;
+    if (changes['socketConnected'] && changes['socketConnected'].currentValue === true) {
+      this.getAccountMatch();
+    }
+  }
+
+
+  createFilter(): (data: any, filter: string) => boolean {
+    let filterFunction = function (data, filter): boolean {
+      let searchTerms = JSON.parse(filter);
+      return data.AccountName.toLowerCase().indexOf(searchTerms.AccountName) !== -1
+        && data.AddressLine1.toString().toLowerCase().indexOf(searchTerms.AddressLine1) !== -1
+        && data.City.toLowerCase().indexOf(searchTerms.City) !== -1;
+
+    }
+    return filterFunction;
+  }
+
+
+  async get(refresh = false) {
+    try {
+      this.accountMatch = await this.httpService.getAccountMatch()
+        .pipe(first())
+        .toPromise();
+      this.dataSource.data = this.accountMatch;
+      console.log(this.dataSource.data);
+      //console.log("Organization Name: ", this.accountMatch)
+      console.log("Organization Name: ", this.accountMatch[0])
+      //console.log("Organization Name: ", this.accountMatch[0].City)
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
+      this.loading = false;
+
+      this.zone.run(() => {
+      });
+
+      if (refresh) this.dataService.successMsg('Account Match table updated.');
+    } catch (e) {
+      this.dataService.errorMsg('Unable to get Account Matches. Please try again.');
+      console.log('ACCOUNT MATCH ERROR: ', e);
+    }
+  }
+
+  async getAccountMatch(refresh = false) {
+    try {
+      let accountMatch: any = await this.httpService.getAccountMatch().toPromise()
+
+      // The response you get from http is not a JSON array but a JSON object.
+      // Use Object.values to convert the response into array.
+
+      this.accountMatchSource = new MatTableDataSource(accountMatch);
+      this.accountMatchSource.paginator = this.paginator;
+      this.accountMatchSource.sort = this.sort;
+      this.applyFilter(this.accountMatchFilter);
+      this.zone.run(() => {
+      });
+
+      if (refresh) this.dataService.successMsg('Account Match table updated.');
+    } catch (e) {
+      this.dataService.errorMsg('Unable to get Account Matches. Please try again.');
+      console.log('ACCOUNT MATCH ERROR: ', e);
+    }
+  }
+
+  applyFilter(filterValue: string) {
+    if (filterValue) {
+      filterValue = filterValue.trim();
+      filterValue = filterValue.toLowerCase();
+    }
+    this.accountMatchSource.filter = filterValue;
+  }
+
+  clearFilter() {
+    this.accountMatchFilter = '';
+    this.applyFilter(this.accountMatchFilter);
+  }
+
+  merge() {
+    const confirmChanges = this.dialog.open(ConfirmChangesComponent, {
+
+      autoFocus: false
+    }).afterClosed().subscribe(changes => {
+      if (changes) {
+
+
+      }
+    });
+  }
+
+  selectAccountMatch() {
+    //This is the check boxes
+  }
+
+  toggleDuration() {
+
+  }
+}
+

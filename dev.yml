@@ -1,0 +1,28 @@
+version: '2'
+services:
+  api:
+    image: api
+    restart: always
+    build:
+      context: ./ds-match-api
+      dockerfile: Dockerfile
+    ports:
+      - "2338:2338"
+    environment:
+      - ENV=development
+    volumes:
+      - /app/node_modules
+      - ./ds-match-api:/app
+  admin:
+    image: admin
+    restart: always
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./ds-match-admin
+    volumes:
+      - /app/node_modules
+      - ./ds-match-admin:/app
+    environment:
+      - ENV=development
+    ports:
+      - "4200:4200"

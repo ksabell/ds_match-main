@@ -1,0 +1,44 @@
+/* You can add global styles to this file, and also import other style files */
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.snackbar-success {
+  background: #51a351;
+  color: white;
+}
+
+.snackbar-error {
+  background: #bd362f;
+  color: white;
+}
+
+.hover-table > mat-row:hover {
+  background-color: rgb(173, 224, 244);
+  cursor: pointer;
+}
+
+mat-row, mat-header-row {
+  padding-left: 5px;
+}
+
+.single-icon-col {
+  flex: 0 0 50px !important;
+}
+
+.mat-card-header {
+  display: block !important;
+  flex-direction: row;
+}
+
+.yellow-snackbar {
+  background: lightgoldenrodyellow;
+  color: black;
+}

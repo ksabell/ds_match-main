@@ -1,0 +1,17 @@
+<mat-toolbar color="primary" style=" height: 35px !important;">
+  <h3>Account Match</h3>
+  <span style="flex: 1 1 auto;"></span>
+<!--  <button mat-icon-button matTooltip="Users" (click)="selectedPlatform = 'users'">-->
+  <button mat-icon-button matTooltip="Users">
+    <mat-icon>person</mat-icon>
+  </button>
+
+  <button mat-icon-button (click)="logout()">
+    <mat-icon matTooltip="Logout">logout</mat-icon>
+  </button>
+</mat-toolbar>
+
+<app-account-match></app-account-match>
+
+
+

@@ -1,0 +1,111 @@
+<div mat-dialog-title style="margin: -24px -24px 20px;">
+  <mat-toolbar id="confirmChangesTitle" color="primary">
+    Update Primary Profile
+  </mat-toolbar>
+
+</div>
+
+<div mat-dialog-title>
+  {{this.currentPrimaryIdText}}
+</div>
+<table mat-table [dataSource]="dataSourceItem" class="mat-elevation-z2">
+
+  <ng-container matColumnDef="sourceSystemID">
+    <th mat-header-cell *matHeaderCellDef>Source System ID</th>
+    <td mat-cell *matCellDef="let accountMatch"> {{accountMatch.SourceSystemID}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="sourceSystem">
+    <th mat-header-cell *matHeaderCellDef>Source System</th>
+    <td mat-cell *matCellDef="let accountMatch"> {{accountMatch.SourceSystem}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="name">
+    <th mat-header-cell *matHeaderCellDef> Account Name</th>
+    <td mat-cell *matCellDef="let accountMatch"> {{accountMatch.AccountName}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="state">
+    <th mat-header-cell *matHeaderCellDef> State</th>
+    <td mat-cell *matCellDef="let accountMatch"> {{accountMatch.State}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="city">
+    <th mat-header-cell *matHeaderCellDef> City</th>
+    <td mat-cell *matCellDef="let accountMatch"> {{accountMatch.City}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="addr1">
+    <th mat-header-cell *matHeaderCellDef> Address Line 1</th>
+    <td mat-cell *matCellDef="let accountMatch"> {{accountMatch.AddressLine1}}  </td>
+  </ng-container>
+
+  <ng-container matColumnDef="primaryProfile">
+    <th mat-header-cell *matHeaderCellDef> Primary Profile</th>
+    <td mat-cell *matCellDef="let accountMatch">  <mat-icon class="white" color="primary">check_box</mat-icon> </td>
+  </ng-container>
+
+  <!--  <ng-header matColumnDef="primaryProfile">-->
+  <!--    <th mat-header-cell *matHeaderCellDef [hidden]="primaryIdFlag">Primary Profile </th>-->
+  <!--    <td mat-cell *matCellDef="let accountMatch" [hidden]="primaryIdFlag">These records belong to Primary Profile {{savedPrimaryProfileID}}. Do you want to merge all of them with Match Group ID {{currentPrimaryId}}? </td>-->
+  <!--    <span></span>-->
+  <!--  </ng-header>-->
+
+  <tr mat-header-row *matHeaderRowDef="dataSourceItemColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: dataSourceItemColumns;"></tr>
+</table>
+<table mat-table [dataSource]="dataSourcePrimary" class="mat-elevation-z2">
+
+  <ng-container matColumnDef="sourceSystemID">
+    <th mat-header-cell *matHeaderCellDef>Source System ID</th>
+    <td mat-cell *matCellDef="let accountMatch"> {{accountMatch.SourceSystemID}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="sourceSystem">
+    <th mat-header-cell *matHeaderCellDef>Source System</th>
+    <td mat-cell *matCellDef="let accountMatch"> {{accountMatch.SourceSystem}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="name">
+    <th mat-header-cell *matHeaderCellDef> Account Name</th>
+    <td mat-cell *matCellDef="let accountMatch"> {{accountMatch.AccountName}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="state">
+    <th mat-header-cell *matHeaderCellDef> State</th>
+    <td mat-cell *matCellDef="let accountMatch"> {{accountMatch.State}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="city">
+    <th mat-header-cell *matHeaderCellDef> City</th>
+    <td mat-cell *matCellDef="let accountMatch"> {{accountMatch.City}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="addr1">
+    <th mat-header-cell *matHeaderCellDef> Address Line 1</th>
+    <td mat-cell *matCellDef="let accountMatch"> {{accountMatch.AddressLine1}}  </td>
+  </ng-container>
+
+  <ng-container matColumnDef="primaryProfile">
+    <th mat-header-cell *matHeaderCellDef> Primary Profile</th>
+    <td mat-cell *matCellDef="let accountMatch">   </td>
+  </ng-container>
+
+  <!--  <ng-header matColumnDef="primaryProfile">-->
+  <!--    <th mat-header-cell *matHeaderCellDef [hidden]="primaryIdFlag">Primary Profile </th>-->
+  <!--    <td mat-cell *matCellDef="let accountMatch" [hidden]="primaryIdFlag">These records belong to Primary Profile {{savedPrimaryProfileID}}. Do you want to merge all of them with Match Group ID {{currentPrimaryId}}? </td>-->
+  <!--    <span></span>-->
+  <!--  </ng-header>-->
+
+  <tr mat-header-row *matHeaderRowDef="dataSourcePrimaryColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: dataSourcePrimaryColumns;"></tr>
+</table>
+
+<div mat-dialog-actions>
+  <div style="margin-left: auto">
+    <button id="CloseModal" mat-raised-button mat-dialog-close color="primary" (click)="onCancel()">Cancel</button>
+    <button id="SaveChanges" mat-raised-button color="primary" (click)="save()">
+      Save
+    </button>
+  </div>
+</div>

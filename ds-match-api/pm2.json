@@ -1,0 +1,25 @@
+{
+  "name": "ds-match-api",
+  "script": "app.js",
+  "instances": "1",
+  "merge_logs": true,
+  "log_date_format": "YYYY_MM_DD HH:mm:ss",
+  "output": "./logs/api.log",
+  "error": "./logs/api.log",
+  "watch": true,
+  "ignore_watch" : ["node_modules", "logs", "dockerData"],
+  "watch_options": {
+    "usePolling": true
+  },
+  "env_test": {
+    "NODE_ENV": "test",
+    "watch": false
+  },
+  "env_production" : {
+    "NODE_ENV": "production",
+    "watch": false
+  },
+  "env": {
+    "NODE_ENV": "development"
+  }
+}

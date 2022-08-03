@@ -1,0 +1,21 @@
+<!--<mat-card class="mat-elevation-z12" style="width: 50%; min-width: 400px; max-width: 700px; margin:0 auto;">-->
+<mat-card class="mat-elevation-z12" style="width: 50%; min-width: 400px; top: 30%; max-width: 700px; margin: 0 auto;">
+  <mat-card-title>
+    DS Match
+  </mat-card-title>
+  <mat-divider></mat-divider>
+  <mat-card-content>
+    <form (submit)="login()" style="margin: 20px 25%;">
+      <mat-form-field style="width:100%;" appearance="outline">
+        <input matInput [(ngModel)]="email" name="email" placeholder="Email" type="email" autofocus maxlength="100">
+      </mat-form-field>
+      <br>
+      <mat-form-field style="width:100%;" appearance="outline">
+        <input matInput [(ngModel)]="password" name="password" placeholder="Password" type="{{showPassword ? 'text' : 'password'}}" maxlength="100">
+        <mat-icon matSuffix (mouseover)="showPassword = true" (mouseleave)="showPassword = false">visibility</mat-icon>
+      </mat-form-field>
+      <br>
+      <button mat-raised-button type="submit" color="primary" style="width:100%;">Sign In</button>
+    </form>
+  </mat-card-content>
+</mat-card>

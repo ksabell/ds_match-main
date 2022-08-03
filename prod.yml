@@ -1,0 +1,25 @@
+version: '3'
+services:
+  api:
+    image: nensc/dataservices_match_api:latest
+    restart: always
+    build:
+      context: ./ds-match-api
+      dockerfile: Dockerfile
+    environment:
+      - ENV=production
+  admin:
+    image: nensc/dataservices_match:latest
+    restart: always
+    build:
+      context: ./ds-match-admin
+      dockerfile: Dockerfile
+#  proxy:
+#    image: nensc/hamilton_relay_proxy:2
+#    build:
+#      dockerfile: Dockerfile
+#      context: ./nginx
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    restart: always
