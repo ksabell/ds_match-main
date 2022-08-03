@@ -1,4 +1,4 @@
-import {Component, ElementRef, NgZone, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {Component, ElementRef, Inject, NgZone, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {HttpService} from "../../http.service";
 import {DataService} from "../../data.service";
 import {MatPaginator} from "@angular/material/paginator";
@@ -69,12 +69,12 @@ export class AccountMatchComponent implements OnInit {
   header: string;
   text: string;
   selectedAction = '';
-  selectedBoxflag = false;
-  primaryBoxflag = false;
+  selectedflag = false;
+  primaryflag = false;
   alertflag = false;
   buttonHeader = '';
   buttonText = '';
-  unselectedBoxflag_S = true;
+  unselectedflag_S = true;
   uppflag = false;
   invalidflag = true;
   mrflag = false;
@@ -89,10 +89,12 @@ export class AccountMatchComponent implements OnInit {
     private dialog: MatDialog,
     public alertService: AlertService
   ) {
+    //console.log('Called Constructor');
     this.getAccountMatch();
   }
 
   ngOnInit() {
+    //console.log('Called ngOnInit method');
     this.getPrimaryDesc();
     this.getAccountMatch();
     this.loading = true;
@@ -100,6 +102,8 @@ export class AccountMatchComponent implements OnInit {
     this.filterEntity = new AccountMatch();
     this.filterType = MatTableFilter.ANYWHERE;
     this.accountMatchSource = new MatTableDataSource(this.accountMatch);
+    //console.log(this.accountMatchSource);
+
   }
 
   applyFilter(filterValue: string) {
@@ -110,7 +114,11 @@ export class AccountMatchComponent implements OnInit {
 
     this.accountMatchSource.paginator = this.paginator;
     this.countSelectedPrimary = this.selectedPrimaryItem.length;
+    console.log('this.countSelectedPrimary');
+    console.log(this.countSelectedPrimary);
     this.countSelectedItem = this.selectedItems.length;
+    console.log('this.countSelectedItem');
+    console.log(this.countSelectedItem);
     this.loading = false;
     this.filterEntity.MatchGroupID = '';
     this.filterEntity.AccountName = '';
@@ -156,7 +164,15 @@ export class AccountMatchComponent implements OnInit {
   }
 
   submit(action) {
+    console.log('this.selectedAction');
+    console.log(this.selectedAction);
+    console.log(this.selectedItems);
+    console.log('this.selectedItems.length');
+    console.log(this.selectedItems.length);
+    console.log(this.selectedPrimaryItem);
     if (this.countSelectedItem == 0 && this.countSelectedPrimary == 0) {
+      console.log('Invalid');
+
       Swal.fire({
         title: 'Invalid Selection(s)',
         text: 'Please follow the selection prompts at the top of the screen corresponding to the selected button.',
@@ -164,9 +180,23 @@ export class AccountMatchComponent implements OnInit {
         confirmButtonColor: '#3f51b5',
         confirmButtonText: 'Ok',
       }).then((result) => {
+        console.log('clear data')
         this.clearData();
       });
     } else {
+      // console.log('this.countSelectedItem');
+      // console.log(this.countSelectedItem);
+      // if (this.countSelectedItem > 15) {
+      //   this.height = "100%"
+      // } else {
+      //   this.height = "auto"
+      // }
+      console.log('this.selectedItems');
+      console.log(this.selectedItems);
+      console.log('this.selectedItems.length');
+      console.log(this.selectedItems.length);
+      console.log('this.selectedPrimaryItem');
+      console.log(this.selectedPrimaryItem);
       this.dialog.open(ConfirmChangesComponent, {
         data: {
           selectedItems: this.selectedItems,
@@ -181,25 +211,38 @@ export class AccountMatchComponent implements OnInit {
         height: "100%"
       }).afterClosed().subscribe(changes => {
         if (changes) {
+          console.log('CHANGES ');
+          console.log(changes);
           this.updateAccountMatch(changes);
           this.dataService.successMsg('Account Matched data. Success.');
+          console.log('clear data')
           this.clearData();
         }
       });
+
     }
   }
 
   updatePrimaryProfile() {
+    console.log(this.selectedItems);
+    console.log('this.selectedItems.length');
+    console.log(this.selectedItems.length);
+    console.log(this.selectedPrimaryItem);
     if (this.countSelectedItem == 0 && this.countSelectedPrimary == 0) {
+      console.log('Invalid');
       Swal.fire({
         title: 'Invalid Selection(s)',
         text: 'Please follow the selection prompts at the top of the screen corresponding to the selected button.',
         icon: 'error',
         confirmButtonColor: '#3f51b5',
         confirmButtonText: 'Ok',
+
       }).then((result) => {
+
       });
     } else {
+      console.log('this.selectedPrimaryId_P_String');
+      console.log(this.selectedPrimaryId_P_String);
       this.dialog.open(UpdatePrimaryProfileComponent, {
         data: {
           selectedItems: this.selectedPrimaryItem,
@@ -210,10 +253,17 @@ export class AccountMatchComponent implements OnInit {
         disableClose: true,
         autoFocus: false
       }).afterClosed().subscribe(changes => {
+        //console.log(changes);
         if (changes) {
+          console.log('CHANGES ');
+          console.log(changes);
+          //this.loadingPP = true;
           this.changePrimaryProfile(changes);
+
+          console.log('clear data')
           this.clearData();
           this.dataService.successPPMsg('Account Matched Primary Profile is updating! Please wait.');
+
         }
       });
     }
@@ -239,12 +289,14 @@ export class AccountMatchComponent implements OnInit {
     //this.loadingPP = false;
     this.clearCheckboxes();
     this.selectedPrimaryItem = [];
+    console.log('this.selectedItems.length');
+    console.log(this.selectedItems.length);
     this.selectedItems = [];
     this.buttonText = '';
     this.buttonHeader = '';
     this.alertflag = false;
-    this.selectedBoxflag = false;
-    this.primaryBoxflag = false;
+    this.selectedflag = false;
+    this.primaryflag = false;
     this.updateflag = false;
     this.removeflag = false;
     this.submitflag = false;
@@ -258,92 +310,176 @@ export class AccountMatchComponent implements OnInit {
       element.nativeElement.checked = false;
     });
     this.submitflag = false;
+    console.log('this.submitflag');
+    console.log(this.submitflag);
   }
 
   getSelectedBox(e: any, accountMatch) {
+
     if (e.target.checked) {
       this.selectedItems.push(accountMatch);
+      console.log('this.selectedItems');
+      console.log(this.selectedItems);
+      console.log('this.selectedItems.length');
+      console.log(this.selectedItems.length);
       if (accountMatch.MatchGroupID != null) {
         this.currentMatchGroupId_S = accountMatch.MatchGroupID;
+        console.log('this.currentMatchGroupId_S');
+        console.log(this.currentMatchGroupId_S);
         this.selectedMatchGroupId = accountMatch.MatchGroupID;
       }
       this.sourceSystemId_S = accountMatch.SourceSystemID;
-      this.unselectedBoxflag_S = false;
+      console.log('this.sourceSystemId_S');
+      console.log(this.sourceSystemId_S);
+      this.unselectedflag_S = false;
+      console.log('this.unselectedflag_S');
+      console.log(this.unselectedflag_S);
       this.invalidflag = false;
+      console.log('this.invalidflag');
+      console.log(this.invalidflag);
     } else {
       this.selectedItems = this.selectedItems.filter(m => m != accountMatch);
+      console.log('this.selectedItems');
+      console.log(this.selectedItems);
+      console.log('this.selectedItems.length');
+      console.log(this.selectedItems.length);
+
       if (this.selectedItems.length == 0) {
         this.submitflag = false;
+        console.log('this.submitflag');
+        console.log(this.submitflag);
       }
       e.target.checked = false;
-      this.unselectedBoxflag_S = true;
+      this.unselectedflag_S = true;
+      console.log('this.unselectedflag_S');
+      console.log(this.unselectedflag_S);
     }
     this.countSelectedItem = 0;
+    console.log('this.countSelectedItem');
+    console.log(this.countSelectedItem);
+
     this.submitOn();
   }
 
   getPrimaryBox(e: any, accountMatch) {
     if (e.target.checked) {
       this.selectedPrimaryItem.push(accountMatch);
+      console.log('this.selectedPrimaryItem');
+      console.log(this.selectedPrimaryItem);
+
       if (accountMatch.MatchGroupID != null) {
         this.currentMatchGroupId_P = accountMatch.MatchGroupID;
+        console.log('this.currentMatchGroupId_P');
+        console.log(this.currentMatchGroupId_P);
       }
       if (accountMatch.PrimaryProfile != null) {
         this.currentPrimaryId = accountMatch.PrimaryProfile;
+        console.log('this.currentPrimaryId');
+        console.log(this.currentPrimaryId);
       }
+
       this.invalidflag = false;
+      console.log('this.invalidflag');
+      console.log(this.invalidflag);
     } else {
       this.selectedPrimaryItem = this.selectedPrimaryItem.filter(m => m != accountMatch);
+      console.log('this.selectedPrimaryItem');
+      console.log(this.selectedPrimaryItem);
       e.target.checked = false;
 
       if (this.selectedPrimaryItem.length > 1) {
         this.submitflag = false;
+        console.log('this.submitflag');
+        console.log(this.submitflag);
       }
     }
     this.countSelectedPrimary = 0;
+    console.log('this.countSelectedPrimary');
+    console.log(this.countSelectedPrimary);
     this.submitOn();
   }
 
   submitOn() {
+    console.log('SubmitOn');
+    console.log('this.selectedItems.length');
+    console.log(this.selectedItems.length);
     this.countSelectedItem = this.selectedItems.length;
+    console.log('this.countSelectedItem');
+    console.log(this.countSelectedItem);
+
     if (this.countSelectedItem >= 1) {
       this.selectedPrimaryId_S_String = JSON.stringify(this.selectedItems[0]['PrimaryProfile']);
       this.selectedMatchGroupId_S_String = JSON.stringify(this.selectedItems[0]['MatchGroupID']);
+
     } else {
       this.selectedPrimaryId_S_String = '';
       this.selectedMatchGroupId_S_String = ''
     }
+    console.log('this.selectedPrimaryId_S_String');
+    console.log(this.selectedPrimaryId_S_String);
+    console.log('this.selectedMatchGroupId_S_String');
+    console.log(this.selectedMatchGroupId_S_String);
+
     if (this.selectedAction == "UPP") {
-      if (this.countSelectedItem == 1 && this.countSelectedPrimary == 1 && this.selectedPrimaryId_P_String == 'null') {
-        this.uppflag = true;
+
+      if (this.countSelectedItem == 1 && this.countSelectedPrimary == 1) {
+        if (this.currentMatchGroupId_S == this.currentMatchGroupId_P) {
+          if(this.sourceSystemId_P != this.sourceSystemId_S)
+          this.uppflag = true;
+          console.log('this.uppflag');
+          console.log(this.uppflag);
+        }
+
       } else {
         this.uppflag = false;
+        console.log('this.uppflag');
+        console.log(this.uppflag);
       }
     }
 
     this.countSelectedPrimary = this.selectedPrimaryItem.length;
+    console.log('this.countSelectedPrimary');
+    console.log(this.countSelectedPrimary);
     if (this.countSelectedPrimary == 1) {
       this.selectedPrimaryId_P_String = JSON.stringify(this.selectedPrimaryItem[0]['PrimaryProfile']);
+      console.log('this.selectedPrimaryId_P_String');
+      console.log(this.selectedPrimaryId_P_String);
     } else {
       this.selectedPrimaryId_P_String = "";
+      console.log('this.selectedPrimaryId_P_String');
+      console.log(this.selectedPrimaryId_P_String);
     }
+
 
     if (this.selectedAction == "MR") {
       if (this.countSelectedPrimary != 1) {
         this.mrflag = false;
+        console.log('this.mrflag');
+        console.log(this.mrflag);
       } else if (this.countSelectedItem <= 0) {
         this.mrflag = false;
+        console.log('this.mrflag');
+        console.log(this.mrflag);
       } else if (this.selectedPrimaryId_P_String == this.selectedMatchGroupId_S_String) {
         this.mrflag = false;
+        console.log('this.mrflag');
+        console.log(this.mrflag);
       }
     }
+    console.log('this.selectedItems.length');
+    console.log(this.selectedItems.length);
+
     if (this.selectedItems.length > 0) {
       this.sourceSystemId_S = this.selectedItems[0]['SourceSystemID'];
+      console.log('this.sourceSystemId_S');
+      console.log(this.sourceSystemId_S);
     } else {
       this.sourceSystemId_S = 0
     }
     if (this.selectedPrimaryItem.length > 0) {
       this.sourceSystemId_P = this.selectedPrimaryItem[0]['SourceSystemID'];
+      console.log('this.sourceSystemId_P');
+      console.log(this.sourceSystemId_P);
     } else {
       this.sourceSystemId_P = 0
     }
@@ -351,6 +487,9 @@ export class AccountMatchComponent implements OnInit {
       case "N": {
         if (this.countSelectedPrimary > 1) {
           this.submitflag = false;
+          console.log('this.submitflag');
+          console.log(this.submitflag);
+          console.log('Invalid');
           Swal.fire({
             title: 'Invalid Selection(s)',
             text: 'Please follow the selection prompts at the top of the screen corresponding to the selected button.',
@@ -361,10 +500,19 @@ export class AccountMatchComponent implements OnInit {
           });
         } else if (this.countSelectedItem == 0) {
           this.submitflag = false;
+          console.log('this.submitflag');
+          console.log(this.submitflag);
         } else if (this.sourceSystemId_S == 0 && this.sourceSystemId_P == 0) {
+
           this.submitflag = false;
+          console.log('this.submitflag');
+          console.log(this.submitflag);
         } else if (this.sourceSystemId_S == this.sourceSystemId_P) {
+
           this.submitflag = false;
+          console.log('this.submitflag');
+          console.log(this.submitflag);
+          console.log('Invalid');
           Swal.fire({
             title: 'Invalid Selection(s)',
             text: 'Please follow the selection prompts at the top of the screen corresponding to the selected button.',
@@ -375,12 +523,22 @@ export class AccountMatchComponent implements OnInit {
           });
         } else if (this.countSelectedPrimary != 1) {
           this.submitflag = false;
+          console.log('this.submitflag');
+          console.log(this.submitflag);
         } else if (this.countSelectedPrimary == 1 && this.countSelectedItem >= 1) {
           this.submitflag = true;
+          console.log('this.submitflag');
+          console.log(this.submitflag);
         }
         break;
       }
       case "MR": {
+        console.log('this.selectedPrimaryId_P_String');
+        console.log(this.selectedPrimaryId_P_String);
+        console.log('this.selectedPrimaryId_S_String');
+        console.log(this.selectedPrimaryId_S_String);
+
+        //this.selectedPrimaryId_S_String
         if (this.selectedItems.length >= 1) {
           this.getMatchGroup(this.selectedItems);
         } else {
@@ -388,6 +546,9 @@ export class AccountMatchComponent implements OnInit {
         }
         if (this.countSelectedPrimary > 1) {
           this.submitflag = false;
+          console.log('this.submitflag');
+          console.log(this.submitflag);
+          console.log('Invalid');
           Swal.fire({
             title: 'Invalid Selection(s)',
             text: 'Please follow the selection prompts at the top of the screen corresponding to the selected button.',
@@ -399,6 +560,9 @@ export class AccountMatchComponent implements OnInit {
           });
         } else if (this.selectedPrimaryId_S_String == null) {
           this.submitflag = false;
+          console.log('this.submitflag');
+          console.log(this.submitflag);
+          console.log('Invalid');
           Swal.fire({
             title: 'Invalid Selection(s)',
             text: 'Please follow the selection prompts at the top of the screen corresponding to the selected button.',
@@ -410,12 +574,22 @@ export class AccountMatchComponent implements OnInit {
           });
         } else if (this.selectedPrimaryId_P_String == '') {
           this.submitflag = false;
+          console.log('this.submitflag');
+          console.log(this.submitflag);
         } else if (this.sourceSystemId_S == 0 && this.sourceSystemId_P == 0) {
           this.submitflag = false;
+          console.log('this.submitflag');
+          console.log(this.submitflag);
         } else if (this.sourceSystemId_S == this.sourceSystemId_P) {
           this.submitflag = false;
+          console.log('this.submitflag');
+          console.log(this.submitflag);
+
         } else if (this.selectedMatchGroupId_S_String == this.selectedPrimaryId_P_String) {
           this.submitflag = false;
+          console.log('this.submitflag');
+          console.log(this.submitflag);
+          console.log('Invalid');
           Swal.fire({
             title: 'Invalid Selection(s)',
             text: 'Please follow the selection prompts at the top of the screen corresponding to the selected button.',
@@ -426,14 +600,21 @@ export class AccountMatchComponent implements OnInit {
           });
         } else if (this.countSelectedPrimary == 1 && this.countSelectedItem >= 1) {
           this.submitflag = true;
+          console.log('this.submitflag');
+          console.log(this.submitflag);
         } else if (this.mrflag) {
           this.submitflag = true;
+          console.log('this.submitflag');
+          console.log(this.submitflag);
         }
         break;
       }
       case "MG": {
         if (this.countSelectedPrimary > 1 || this.countSelectedItem > 1) {
           this.submitflag = false;
+          console.log('this.submitflag');
+          console.log(this.submitflag);
+          console.log('Invalid');
           Swal.fire({
             title: 'Invalid Selection(s)',
             text: 'Please follow the selection prompts at the top of the screen corresponding to the selected button.',
@@ -444,6 +625,9 @@ export class AccountMatchComponent implements OnInit {
           });
         } else if (this.sourceSystemId_S == this.sourceSystemId_P) {
           this.submitflag = false;
+          console.log('this.submitflag');
+          console.log(this.submitflag);
+          console.log('Invalid');
           Swal.fire({
             title: 'Invalid Selection(s)',
             text: 'Please follow the selection prompts at the top of the screen corresponding to the selected button.',
@@ -457,24 +641,38 @@ export class AccountMatchComponent implements OnInit {
         } else {
           this.submitflag = false;
         }
+        console.log('this.submitflag');
+        console.log(this.submitflag);
+
+
         break;
       }
       case "UPP": {
         //statements;
         if (this.uppflag) {
           this.submitflag = true;
+          console.log('this.submitflag');
+          console.log(this.submitflag);
         }
         break;
       }
       case "UR": {
+        //statements;
+        console.log('this.selectedItems');
+        console.log(this.selectedItems);
+        console.log('this.selectedItems.length');
+        console.log(this.selectedItems.length);
         if (this.selectedItems.length >= 1) {
           this.getMatchGroup(this.selectedItems);
         } else {
           this.groupCount = 0;
         }
         if (this.selectedMatchGroupId == 0) {
-          if (this.unselectedBoxflag_S) {
+          if (this.unselectedflag_S) {
             this.submitflag = false;
+            console.log('this.submitflag');
+            console.log(this.submitflag);
+            console.log('Invalid');
             Swal.fire({
               title: 'Invalid Selection(s)',
               text: 'Please follow the selection prompts at the top of the screen corresponding to the selected button.',
@@ -487,6 +685,8 @@ export class AccountMatchComponent implements OnInit {
           }
         } else if (this.countSelectedItem >= 1) {
           this.submitflag = true;
+          console.log('this.submitflag');
+          console.log(this.submitflag);
         }
         break;
       }
@@ -494,6 +694,9 @@ export class AccountMatchComponent implements OnInit {
         //statements;
         if (this.countSelectedPrimary > 1) {
           this.submitflag = false;
+          console.log('this.submitflag');
+          console.log(this.submitflag);
+          console.log('Invalid');
           Swal.fire({
             title: 'Invalid Selection(s)',
             text: 'Please follow the selection prompts at the top of the screen corresponding to the selected button.',
@@ -505,10 +708,16 @@ export class AccountMatchComponent implements OnInit {
           });
         } else if (this.selectedPrimaryId_P_String == 'null' || this.selectedPrimaryId_P_String == '') {
           this.submitflag = false;
+          console.log('this.submitflag');
+          console.log(this.submitflag);
         } else if (this.selectedPrimaryId_P_String == '') {
           this.submitflag = false;
+          console.log('this.submitflag');
+          console.log(this.submitflag);
         } else {
           this.submitflag = true;
+          console.log('this.submitflag');
+          console.log(this.submitflag);
         }
         break;
       }
@@ -521,12 +730,17 @@ export class AccountMatchComponent implements OnInit {
   }
 
   getAction() {
+    console.log('this.selectedAction');
+    console.log(this.selectedAction);
+
     if (this.selectedAction == "N") {
       this.loading = true;
       this.getNoMatch();
       this.alertflag = true;
-      this.selectedBoxflag = true;
-      this.primaryBoxflag = true;
+      this.selectedflag = true;
+      this.primaryflag = true;
+      console.log('this.primaryflag');
+      console.log(this.primaryflag);
       this.buttonHeader = ' To create a brand new match group:';
       this.buttonText = ' Designate a primary record for the new group by selecting the “Primary” checkbox of an ' +
         'unmatched record.  Also select at least one additional unmatched record to add to the new match group ' +
@@ -538,8 +752,10 @@ export class AccountMatchComponent implements OnInit {
       this.selectedPrimaryItem = [];
       this.getAccountMatch();
       this.alertflag = true;
-      this.selectedBoxflag = true;
-      this.primaryBoxflag = true;
+      this.selectedflag = true;
+      this.primaryflag = true;
+      console.log('this.primaryflag');
+      console.log(this.primaryflag);
       this.buttonHeader = ' To merge a record (add a matched or unmatched non-primary record to an existing match group): ',
         this.buttonText = ' Select the “Match Group” checkbox of the record to be added to the existing match group. ' +
           'Also select the “Primary” checkbox of the designated “Primary Profile” of the existing match group you wish to add the record to.';
@@ -550,8 +766,10 @@ export class AccountMatchComponent implements OnInit {
       this.selectedPrimaryItem = [];
       this.getNonMatch();
       this.alertflag = true;
-      this.selectedBoxflag = true;
-      this.primaryBoxflag = true;
+      this.selectedflag = true;
+      this.primaryflag = true;
+      console.log('this.primaryflag');
+      console.log(this.primaryflag);
       this.buttonHeader = ' To merge a group: ',
         this.buttonText = ' Select the “Match Group” checkbox of the group to be added to the existing match group. ' +
           'Also select the “Primary” checkbox of the designated “Primary Profile” of the existing match group you wish to add the group to.';
@@ -562,8 +780,10 @@ export class AccountMatchComponent implements OnInit {
       this.selectedPrimaryItem = [];
       this.getMatched();
       this.alertflag = true;
-      this.selectedBoxflag = false;
-      this.primaryBoxflag = true;
+      this.selectedflag = false;
+      this.primaryflag = true;
+      console.log('this.primaryflag');
+      console.log(this.primaryflag);
       this.buttonHeader = ' To ungroup one or more records that are part of an existing match group (remove the record(s) from the match group): ',
         this.buttonText = ' “Select the “Match Group" checkbox of the record(s) you want to remove from the existing match group. ' +
           'Then click the Submit button. Note that you may not remove a “Primary Profile”  ' +
@@ -575,8 +795,10 @@ export class AccountMatchComponent implements OnInit {
       this.selectedPrimaryItem = [];
       this.getMatched();
       this.alertflag = true;
-      this.selectedBoxflag = true;
-      this.primaryBoxflag = true;
+      this.selectedflag = true;
+      this.primaryflag = true;
+      console.log('this.primaryflag');
+      console.log(this.primaryflag);
       this.buttonHeader = ' To update the designated "Primary Profile” record of an existing match group: ',
         this.buttonText = ' Select the “Primary” checkbox for the record you want to designate as the new “Primary Profile.”  ' +
           'Also select the “Match Group” checkbox of the record you wish to replace as the “Primary Profile.” Then click the Submit button.';
@@ -585,10 +807,12 @@ export class AccountMatchComponent implements OnInit {
       this.loading = true;
       this.selectedItems = [];
       this.selectedPrimaryItem = [];
-      this.primaryBoxflag = false;
+      this.primaryflag = false;
+      console.log('this.primaryflag');
+      console.log(this.primaryflag);
       this.getMatched();
       this.alertflag = true;
-      this.selectedBoxflag = true;
+      this.selectedflag = true;
       this.buttonHeader = ' To dissolve entire group (ungroup existing match group): ',
         this.buttonText = ' Select the "Primary” checkbox of the designated “Primary Profile” record of the existing match group you want to completely dissolve. Then click the Submit button';
     }
@@ -613,6 +837,8 @@ export class AccountMatchComponent implements OnInit {
             this.submit(this.selectedAction);
           } else if (result.dismiss === Swal.DismissReason.cancel) {
             Swal.fire('Cancelled', '', 'error');
+            //   console.log('clear data')
+            //   this.clearData();
           }
         });
         break;
@@ -633,6 +859,8 @@ export class AccountMatchComponent implements OnInit {
             this.submit(this.selectedAction);
           } else if (result.dismiss === Swal.DismissReason.cancel) {
             Swal.fire('Cancelled', '', 'error');
+            //   console.log('clear data')
+            //   this.clearData();
           }
         });
         break;
@@ -719,7 +947,9 @@ export class AccountMatchComponent implements OnInit {
               this.removeMatch();
             } else if (result.dismiss === Swal.DismissReason.cancel) {
               Swal.fire('Cancelled', '', 'error');
+              console.log('clear data')
               this.clearData();
+
             }
           });
         }
@@ -742,6 +972,9 @@ export class AccountMatchComponent implements OnInit {
             this.updatePrimaryProfile();
           } else if (result.dismiss === Swal.DismissReason.cancel) {
             Swal.fire('Cancelled', '', 'error');
+            //   console.log('clear data')
+            //   this.clearData();
+
           }
         });
         break;
@@ -773,6 +1006,7 @@ export class AccountMatchComponent implements OnInit {
       if (refresh) this.dataService.successMsg('Account Matched data. Success.');
     } catch (e) {
       this.dataService.errorMsg('Unable to get Account Matches. Please try again.');
+      //console.log('ACCOUNT MATCH ERROR: ', e);
     }
   }
 
@@ -788,10 +1022,12 @@ export class AccountMatchComponent implements OnInit {
 
     } catch (e) {
       this.dataService.errorMsg('Unable to get Account Matches. Please try again.');
+      //console.log('ACCOUNT MATCH ERROR: ', e);
     }
   }
 
   async changePrimaryProfile(changes) {
+    //console.log(changes);
     this.accountMatch = await this.httpService.updateAccountMatch(changes).pipe(first()).toPromise();
     this.accountMatchSource = new MatTableDataSource(this.accountMatch);
     //this.loading = false;
@@ -801,21 +1037,27 @@ export class AccountMatchComponent implements OnInit {
     try {
       this.currentPrimary = await this.httpService.getPrimaryDesc().pipe(first()).toPromise()
       this.maxPrimaryId = this.currentPrimary[0]['PrimaryProfile']
+      console.log('this.maxPrimaryId');
+      console.log(this.maxPrimaryId);
       //this.loading = false;
       this.zone.run(() => {
       });
     } catch (e) {
       this.dataService.errorMsg('Unable to get Account Primary Profile. Please try again.');
+      //console.log('ACCOUNT MATCH ERROR: ', e);
     }
   }
 
   async updateAccountMatch(changes) {
+    //console.log(changes);
     try {
       this.accountMatch = await this.httpService.updateAccountMatch(changes).pipe(first()).toPromise();
       this.accountMatchSource.data = this.accountMatch;
       this.accountMatchSource.paginator = this.paginator;
       this.applyFilter(this.accountMatchFilter);
       this.getPrimaryDesc();
+      // this.loading = false;
+      console.log('clear data')
       this.clearData();
       this.dataService.successMsg('Account Matched data. Success.');
     } catch (e) {
@@ -825,6 +1067,7 @@ export class AccountMatchComponent implements OnInit {
   }
 
   async removeAccountMatch(changes) {
+    console.log(changes);
     try {
       this.accountMatch = await this.httpService.removeMatch(changes).pipe(first()).toPromise();
 
@@ -833,6 +1076,7 @@ export class AccountMatchComponent implements OnInit {
       this.applyFilter(this.accountMatchFilter);
       this.getPrimaryDesc();
       // this.loading = false;
+      console.log('clear data')
       this.clearData();
       this.dataService.successMsg('Account Matched data. Success.');
     } catch (e) {
@@ -842,14 +1086,20 @@ export class AccountMatchComponent implements OnInit {
   }
 
   async getMatchGroup(id) {
+    console.log('getGroupCount');
+    console.log(id);
     this.groupCount = 0;
     try {
       this.accountMatch = await this.httpService.getMatchGroup(id).pipe(first()).toPromise();
 
       this.groupCount = this.accountMatch.length;
       this.groupCount = this.groupCount - 1;
+      console.log(this.groupCount);
       if (this.groupCount == 1) {
         this.submitflag = false;
+        console.log('this.submitflag');
+        console.log(this.submitflag);
+        console.log('Invalid');
         Swal.fire({
           title: 'Invalid Selection(s)',
           text: 'Please follow the selection prompts at the top of the screen corresponding to the selected button.',
@@ -861,6 +1111,9 @@ export class AccountMatchComponent implements OnInit {
         });
       } else if (this.groupCount == 2 && this.countSelectedItem == 2) {
         this.submitflag = false;
+        console.log('this.submitflag');
+        console.log(this.submitflag);
+        console.log('Invalid');
         Swal.fire({
           title: 'Invalid Selection(s)',
           text: 'Please follow the selection prompts at the top of the screen corresponding to the selected button.',
@@ -893,10 +1146,12 @@ export class AccountMatchComponent implements OnInit {
       this.dataService.successMsg('Account Matched data. Success');
     } catch (e) {
       this.dataService.errorMsg('Unable to get Account Non Matches. Please try again.');
+      //console.log('ACCOUNT MATCH ERROR: ', e);
     }
   }
 
   async getNoMatch() {
+    console.log('getNoMatch');
     try {
 
       this.accountMatch = await this.httpService.getNoMatch().pipe(first()).toPromise()
@@ -909,10 +1164,12 @@ export class AccountMatchComponent implements OnInit {
       this.dataService.successMsg('Account Match data. Success.');
     } catch (e) {
       this.dataService.errorMsg('Unable to get Account No Matches. Please try again.');
+      //console.log('ACCOUNT MATCH ERROR: ', e);
     }
   }
 
   async getMatched() {
+    console.log('getMatched');
     try {
 
       this.accountMatch = await this.httpService.getMatched().pipe(first()).toPromise()
@@ -925,6 +1182,7 @@ export class AccountMatchComponent implements OnInit {
       this.dataService.successMsg('Account Matched data. Success');
     } catch (e) {
       this.dataService.errorMsg('Unable to get Account Matched. Please try again.');
+      //console.log('ACCOUNT MATCH ERROR: ', e);
     }
   }
 
@@ -941,11 +1199,13 @@ export class AccountMatchComponent implements OnInit {
       this.dataService.successMsg('Account Matched data. Success.');
     } catch (e) {
       this.dataService.errorMsg('Unable to get Account Match Data. Please try again.');
+      //console.log('ACCOUNT MATCH ERROR: ', e);
     }
   }
 
   async removeMatch() {
     if (this.countSelectedItem == 0 && this.countSelectedPrimary == 0) {
+      console.log('Invalid');
       Swal.fire({
         title: 'Invalid Selection(s)',
         text: 'Please follow the selection prompts at the top of the screen corresponding to the selected button.',
@@ -954,9 +1214,17 @@ export class AccountMatchComponent implements OnInit {
         confirmButtonText: 'Ok',
 
       }).then((result) => {
+        console.log('clear data')
         this.clearData();
       });
     } else {
+      // console.log('this.selectedItems.length');
+      // console.log(this.selectedItems.length);
+      // if (this.selectedItems.length > 15) {
+      //   this.height = "100%"
+      // } else {
+      //   this.height = "auto"
+      // }
       this.dialog.open(RemoveComponent, {
         data: {
           selectedItems: this.selectedItems,
@@ -968,13 +1236,20 @@ export class AccountMatchComponent implements OnInit {
         autoFocus: false,
         height: "100%"
       }).afterClosed().subscribe(changes => {
+        //console.log(changes);
         if (changes) {
+          console.log('CHANGES ');
+          console.log(changes);
           this.removeAccountMatch(changes);
           // this.loading = false;
           this.dataService.successMsg('Account Matched data. Success.');
+          console.log('clear data')
           this.clearData();
+
         }
+
       });
+
     }
   }
 
