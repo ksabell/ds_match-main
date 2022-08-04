@@ -50,8 +50,8 @@ export class AccountMatchComponent implements OnInit {
   primaryBox = false;
   selectedItems: string[] = [];
   selectedPrimaryItem: string[] = [];
-  countSelectedPrimary: number;
-  countSelectedItem: number;
+  // countSelectedPrimary: number;
+  // countSelectedItem: number;
   currentPrimary;
   maxPrimaryId = 0;
   currentPrimaryId = 0;
@@ -113,12 +113,12 @@ export class AccountMatchComponent implements OnInit {
     }
 
     this.accountMatchSource.paginator = this.paginator;
-    this.countSelectedPrimary = this.selectedPrimaryItem.length;
-    console.log('this.countSelectedPrimary');
-    console.log(this.countSelectedPrimary);
-    this.countSelectedItem = this.selectedItems.length;
-    console.log('this.countSelectedItem');
-    console.log(this.countSelectedItem);
+    // this.countSelectedPrimary = this.selectedPrimaryItem.length;
+    console.log('this.selectedPrimaryItem.length');
+    console.log(this.selectedPrimaryItem.length);
+    // this.countSelectedItem = this.selectedItems.length;
+    console.log('this.selectedItems.length');
+    console.log(this.selectedItems.length);
     this.loading = false;
     this.filterEntity.MatchGroupID = '';
     this.filterEntity.AccountName = '';
@@ -170,7 +170,7 @@ export class AccountMatchComponent implements OnInit {
     console.log('this.selectedItems.length');
     console.log(this.selectedItems.length);
     console.log(this.selectedPrimaryItem);
-    if (this.countSelectedItem == 0 && this.countSelectedPrimary == 0) {
+    if (this.selectedItems.length == 0 && this.selectedPrimaryItem.length == 0) {
       console.log('Invalid');
 
       Swal.fire({
@@ -183,7 +183,38 @@ export class AccountMatchComponent implements OnInit {
         console.log('clear data')
         this.clearData();
       });
-    } else {
+    }if(this.selectedAction == "MG"){
+      console.log('this.selectedItems');
+      console.log(this.selectedItems);
+      console.log('this.selectedItems.length');
+      console.log(this.selectedItems.length);
+      console.log('this.selectedPrimaryItem');
+      console.log(this.selectedPrimaryItem);
+      this.dialog.open(ConfirmChangesComponent, {
+        data: {
+          selectedItems: this.selectedPrimaryItem,
+          primaryItem: this.selectedItems,
+          primaryId: this.selectedItems[0]['MatchGroupID'],
+          selectedPrimaryId: this.selectedPrimaryId_P_String,
+          action: action,
+        },
+        hasBackdrop: false,
+        disableClose: true,
+        autoFocus: false,
+        height: "100%"
+      }).afterClosed().subscribe(changes => {
+        if (changes) {
+          console.log('CHANGES ');
+          console.log(changes);
+          this.updateAccountMatch(changes);
+          this.dataService.successMsg('Account Matched data. Success.');
+          console.log('clear data')
+          this.clearData();
+        }
+      });
+
+    }
+    else {
       // console.log('this.countSelectedItem');
       // console.log(this.countSelectedItem);
       // if (this.countSelectedItem > 15) {
@@ -228,7 +259,7 @@ export class AccountMatchComponent implements OnInit {
     console.log('this.selectedItems.length');
     console.log(this.selectedItems.length);
     console.log(this.selectedPrimaryItem);
-    if (this.countSelectedItem == 0 && this.countSelectedPrimary == 0) {
+    if (this.selectedItems.length == 0 && this.selectedPrimaryItem.length == 0) {
       console.log('Invalid');
       Swal.fire({
         title: 'Invalid Selection(s)',
@@ -271,8 +302,7 @@ export class AccountMatchComponent implements OnInit {
   }
 
   clearData() {
-    this.countSelectedItem = 0;
-    this.countSelectedPrimary = 0;
+
     this.selectedAction = '';
     // this.dialog.closeAll();
     this.uppflag = false;
@@ -317,7 +347,15 @@ export class AccountMatchComponent implements OnInit {
   getSelectedBox(e: any, accountMatch) {
 
     if (e.target.checked) {
-      this.selectedItems.push(accountMatch);
+      console.log(this.selectedPrimaryItem);
+      if (this.selectedPrimaryItem.length == 1) {
+        if (this.selectedPrimaryItem[0]['SourceSystemID'] == accountMatch.SourceSystemID) {
+          console.log('DO NOT PUSH DUP');
+        } else {
+          this.selectedItems.push(accountMatch);
+        }
+      }
+
       console.log('this.selectedItems');
       console.log(this.selectedItems);
       console.log('this.selectedItems.length');
@@ -354,9 +392,6 @@ export class AccountMatchComponent implements OnInit {
       console.log('this.unselectedflag_S');
       console.log(this.unselectedflag_S);
     }
-    this.countSelectedItem = 0;
-    console.log('this.countSelectedItem');
-    console.log(this.countSelectedItem);
 
     this.submitOn();
   }
@@ -393,9 +428,7 @@ export class AccountMatchComponent implements OnInit {
         console.log(this.submitflag);
       }
     }
-    this.countSelectedPrimary = 0;
-    console.log('this.countSelectedPrimary');
-    console.log(this.countSelectedPrimary);
+
     this.submitOn();
   }
 
@@ -403,11 +436,11 @@ export class AccountMatchComponent implements OnInit {
     console.log('SubmitOn');
     console.log('this.selectedItems.length');
     console.log(this.selectedItems.length);
-    this.countSelectedItem = this.selectedItems.length;
-    console.log('this.countSelectedItem');
-    console.log(this.countSelectedItem);
+    // this.countSelectedItem = this.selectedItems.length;
+    console.log('this.selectedItems.length');
+    console.log(this.selectedItems.length);
 
-    if (this.countSelectedItem >= 1) {
+    if (this.selectedItems.length >= 1) {
       this.selectedPrimaryId_S_String = JSON.stringify(this.selectedItems[0]['PrimaryProfile']);
       this.selectedMatchGroupId_S_String = JSON.stringify(this.selectedItems[0]['MatchGroupID']);
 
@@ -418,16 +451,27 @@ export class AccountMatchComponent implements OnInit {
     console.log('this.selectedPrimaryId_S_String');
     console.log(this.selectedPrimaryId_S_String);
 
+    console.log(this.selectedItems);
+    console.log(this.selectedPrimaryItem);
 
     if (this.selectedAction == "UPP") {
 
-     if (this.countSelectedItem == 1 && this.countSelectedPrimary == 1) {
-        if (this.currentMatchGroupId_S == this.currentMatchGroupId_P) {
-          if (this.sourceSystemId_P != this.sourceSystemId_S) {
-            if (this.selectedPrimaryId_S_String == this.selectedMatchGroupId_S_String) {
-              this.uppflag = true;
-              console.log('this.uppflag');
-              console.log(this.uppflag);
+      if (this.selectedItems.length == 1 && this.selectedPrimaryItem.length == 1) {
+        console.log('this.uppflag 1');
+        //  if (this.currentMatchGroupId_S == this.currentMatchGroupId_P) {
+        //    console.log('this.uppflag 2');
+        if (this.sourceSystemId_P != this.sourceSystemId_S) {
+          console.log('this.uppflag 3');
+          if (this.selectedPrimaryId_S_String == this.selectedMatchGroupId_S_String) {
+            console.log('this.uppflag 4');
+            if (this.selectedItems.length > 0 && this.selectedPrimaryItem.length > 0) {
+              console.log('this.uppflag 5');
+              if (this.selectedItems[0]['MatchGroupID'] == this.selectedPrimaryItem[0]['MatchGroupID']) {
+                this.uppflag = true;
+                console.log('this.uppflag');
+                console.log(this.uppflag);
+              }
+              //    }
             }
           }
         }
@@ -438,10 +482,10 @@ export class AccountMatchComponent implements OnInit {
       }
     }
 
-    this.countSelectedPrimary = this.selectedPrimaryItem.length;
-    console.log('this.countSelectedPrimary');
-    console.log(this.countSelectedPrimary);
-    if (this.countSelectedPrimary == 1) {
+    // this.countSelectedPrimary = this.selectedPrimaryItem.length;
+    console.log('this.selectedPrimaryItem.length');
+    console.log(this.selectedPrimaryItem.length);
+    if (this.selectedPrimaryItem.length == 1) {
       this.selectedPrimaryId_P_String = JSON.stringify(this.selectedPrimaryItem[0]['PrimaryProfile']);
       console.log('this.selectedPrimaryId_P_String');
       console.log(this.selectedPrimaryId_P_String);
@@ -453,11 +497,11 @@ export class AccountMatchComponent implements OnInit {
 
 
     if (this.selectedAction == "MR") {
-      if (this.countSelectedPrimary != 1) {
+      if (this.selectedPrimaryItem.length != 1) {
         this.mrflag = false;
         console.log('this.mrflag');
         console.log(this.mrflag);
-      } else if (this.countSelectedItem <= 0) {
+      } else if (this.selectedItems.length <= 0) {
         this.mrflag = false;
         console.log('this.mrflag');
         console.log(this.mrflag);
@@ -486,7 +530,7 @@ export class AccountMatchComponent implements OnInit {
     }
     switch (this.selectedAction) {
       case "N": {
-        if (this.countSelectedPrimary > 1) {
+        if (this.selectedPrimaryItem.length > 1) {
           this.submitflag = false;
           console.log('this.submitflag');
           console.log(this.submitflag);
@@ -499,17 +543,15 @@ export class AccountMatchComponent implements OnInit {
             confirmButtonText: 'OK',
           }).then((result) => {
           });
-        } else if (this.countSelectedItem == 0) {
+        } else if (this.selectedItems.length == 0) {
           this.submitflag = false;
           console.log('this.submitflag');
           console.log(this.submitflag);
         } else if (this.sourceSystemId_S == 0 && this.sourceSystemId_P == 0) {
-
           this.submitflag = false;
           console.log('this.submitflag');
           console.log(this.submitflag);
         } else if (this.sourceSystemId_S == this.sourceSystemId_P) {
-
           this.submitflag = false;
           console.log('this.submitflag');
           console.log(this.submitflag);
@@ -522,11 +564,11 @@ export class AccountMatchComponent implements OnInit {
             confirmButtonText: 'OK',
           }).then((result) => {
           });
-        } else if (this.countSelectedPrimary != 1) {
+        } else if (this.selectedPrimaryItem.length != 1) {
           this.submitflag = false;
           console.log('this.submitflag');
           console.log(this.submitflag);
-        } else if (this.countSelectedPrimary == 1 && this.countSelectedItem >= 1) {
+        } else if (this.selectedPrimaryItem.length == 1 && this.selectedItems.length >= 1) {
           this.submitflag = true;
           console.log('this.submitflag');
           console.log(this.submitflag);
@@ -545,7 +587,7 @@ export class AccountMatchComponent implements OnInit {
         } else {
           this.groupCount = 0;
         }
-        if (this.countSelectedPrimary > 1) {
+        if (this.selectedPrimaryItem.length > 1) {
           this.submitflag = false;
           console.log('this.submitflag');
           console.log(this.submitflag);
@@ -599,7 +641,7 @@ export class AccountMatchComponent implements OnInit {
             confirmButtonText: 'OK',
           }).then((result) => {
           });
-        } else if (this.countSelectedPrimary == 1 && this.countSelectedItem >= 1) {
+        } else if (this.selectedPrimaryItem.length == 1 && this.selectedItems.length >= 1) {
           this.submitflag = true;
           console.log('this.submitflag');
           console.log(this.submitflag);
@@ -611,7 +653,7 @@ export class AccountMatchComponent implements OnInit {
         break;
       }
       case "MG": {
-        if (this.countSelectedPrimary > 1 || this.countSelectedItem > 1) {
+        if (this.selectedPrimaryItem.length > 1 || this.selectedItems.length > 1) {
           this.submitflag = false;
           console.log('this.submitflag');
           console.log(this.submitflag);
@@ -637,7 +679,7 @@ export class AccountMatchComponent implements OnInit {
             confirmButtonText: 'OK',
           }).then((result) => {
           });
-        } else if (this.countSelectedPrimary == 1 && this.countSelectedItem == 1) {
+        } else if (this.selectedPrimaryItem.length == 1 && this.selectedItems.length == 1) {
           this.submitflag = true;
         } else {
           this.submitflag = false;
@@ -650,7 +692,7 @@ export class AccountMatchComponent implements OnInit {
       }
       case "UPP": {
         //statements;
-        if (this.countSelectedPrimary > 1 || this.countSelectedItem > 1) {
+        if (this.selectedPrimaryItem.length > 1 || this.selectedItems.length > 1) {
           this.submitflag = false;
           console.log('this.submitflag');
           console.log(this.submitflag);
@@ -697,7 +739,23 @@ export class AccountMatchComponent implements OnInit {
               //this.clearData();
             });
           }
-        } else if (this.countSelectedItem >= 1) {
+        } else if (this.selectedItems.length > 0) {
+          if (this.selectedItems[0]['MatchGroupID'] == this.selectedItems[0]['PrimaryProfile']) {
+            this.submitflag = false;
+            console.log('this.submitflag');
+            console.log(this.submitflag);
+            console.log('Invalid');
+            Swal.fire({
+              title: 'Invalid Selection(s)',
+              text: 'Please follow the selection prompts at the top of the screen corresponding to the selected button.',
+              icon: 'error',
+              confirmButtonColor: '#3f51b5',
+              confirmButtonText: 'OK',
+            }).then((result) => {
+              //this.clearData();
+            });
+          }
+        } else if (this.selectedItems.length >= 1) {
           this.submitflag = true;
           console.log('this.submitflag');
           console.log(this.submitflag);
@@ -706,7 +764,7 @@ export class AccountMatchComponent implements OnInit {
       }
       case "DG": {
         //statements;
-        if (this.countSelectedPrimary > 1) {
+        if (this.selectedPrimaryItem.length > 1) {
           this.submitflag = false;
           console.log('this.submitflag');
           console.log(this.submitflag);
@@ -746,7 +804,9 @@ export class AccountMatchComponent implements OnInit {
   getAction() {
     console.log('this.selectedAction');
     console.log(this.selectedAction);
-
+    this.submitflag = false;
+    console.log('this.submitflag');
+    console.log(this.submitflag);
     if (this.selectedAction == "N") {
       this.loading = true;
       this.getNoMatch();
@@ -880,7 +940,6 @@ export class AccountMatchComponent implements OnInit {
         break;
       }
       case "MG": {
-
         Swal.fire({
           title: 'The selected records will be added to the existing match group',
           text: 'You have selected the “Primary” checkbox of the primary profile record for existing match group  ' + this.selectedPrimaryId_S_String + ' and have also selected the “Match Group” checkbox for match group ID ' + this.selectedPrimaryId_P_String + '. Do you want to add these selected match group to existing match group ID  ' + this.selectedPrimaryId_P_String + '?',
@@ -892,6 +951,8 @@ export class AccountMatchComponent implements OnInit {
           cancelButtonText: 'Cancel',
         }).then((result) => {
           if (result.value) {
+            console.log('result.value');
+            console.log(result.value);
             this.submit(this.selectedAction);
           } else if (result.dismiss === Swal.DismissReason.cancel) {
             Swal.fire('Cancelled', '', 'error');
@@ -1123,7 +1184,7 @@ export class AccountMatchComponent implements OnInit {
         }).then((result) => {
           //this.clearData();
         });
-      } else if (this.groupCount == 2 && this.countSelectedItem == 2) {
+      } else if (this.groupCount == 2 && this.selectedItems.length == 2) {
         this.submitflag = false;
         console.log('this.submitflag');
         console.log(this.submitflag);
@@ -1218,7 +1279,7 @@ export class AccountMatchComponent implements OnInit {
   }
 
   async removeMatch() {
-    if (this.countSelectedItem == 0 && this.countSelectedPrimary == 0) {
+    if (this.selectedItems.length == 0 && this.selectedPrimaryItem.length == 0) {
       console.log('Invalid');
       Swal.fire({
         title: 'Invalid Selection(s)',
