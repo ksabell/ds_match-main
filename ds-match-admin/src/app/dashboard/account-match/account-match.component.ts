@@ -417,19 +417,20 @@ export class AccountMatchComponent implements OnInit {
     }
     console.log('this.selectedPrimaryId_S_String');
     console.log(this.selectedPrimaryId_S_String);
-    console.log('this.selectedMatchGroupId_S_String');
-    console.log(this.selectedMatchGroupId_S_String);
+
 
     if (this.selectedAction == "UPP") {
 
-      if (this.countSelectedItem == 1 && this.countSelectedPrimary == 1) {
+     if (this.countSelectedItem == 1 && this.countSelectedPrimary == 1) {
         if (this.currentMatchGroupId_S == this.currentMatchGroupId_P) {
-          if(this.sourceSystemId_P != this.sourceSystemId_S)
-          this.uppflag = true;
-          console.log('this.uppflag');
-          console.log(this.uppflag);
+          if (this.sourceSystemId_P != this.sourceSystemId_S) {
+            if (this.selectedPrimaryId_S_String == this.selectedMatchGroupId_S_String) {
+              this.uppflag = true;
+              console.log('this.uppflag');
+              console.log(this.uppflag);
+            }
+          }
         }
-
       } else {
         this.uppflag = false;
         console.log('this.uppflag');
@@ -649,7 +650,20 @@ export class AccountMatchComponent implements OnInit {
       }
       case "UPP": {
         //statements;
-        if (this.uppflag) {
+        if (this.countSelectedPrimary > 1 || this.countSelectedItem > 1) {
+          this.submitflag = false;
+          console.log('this.submitflag');
+          console.log(this.submitflag);
+          console.log('Invalid');
+          Swal.fire({
+            title: 'Invalid Selection(s)',
+            text: 'Please follow the selection prompts at the top of the screen corresponding to the selected button.',
+            icon: 'error',
+            confirmButtonColor: '#3f51b5',
+            confirmButtonText: 'OK',
+          }).then((result) => {
+          });
+        } else if (this.uppflag) {
           this.submitflag = true;
           console.log('this.submitflag');
           console.log(this.submitflag);
