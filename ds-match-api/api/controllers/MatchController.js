@@ -5,14 +5,14 @@
  * @help        :: See https://sailsjs.com/docs/concepts/actions
  */
 
-const {query} = require("sails-mysql/helpers/private");
+const {query} = require('sails-mysql/helpers/private');
 
 module.exports = {
 
   getAccountMatch: async (req, res) => {
 
     try {
-      let accountMatch = await sails.sendNativeQuery('SELECT *  FROM [dbo].[Account_Match] order by MatchGroupID desc', []);
+      let accountMatch = await sails.sendNativeQuery('SELECT TOP 500 *  FROM [dbo].[Account_Match] order by MatchGroupID desc', []);
 
       return res.json(accountMatch.recordset);
 
@@ -75,7 +75,7 @@ module.exports = {
         // await sails.sendNativeQuery(query_log, []);
 
       }
-      console.log('Accounts updated:', req.body.length);
+     // console.log('Accounts updated:', req.body.length);
       let accountMatch = await sails.sendNativeQuery('SELECT  *  FROM [dbo].[Account_Match] order by MatchGroupID desc', []);
       return res.json(accountMatch.recordset);
 
@@ -135,7 +135,7 @@ module.exports = {
   },
 
   getMatchGroup: async (req, res) => {
-    console.log(req.body[0].MatchGroupID);
+    //console.log(req.body[0].MatchGroupID);
 
     let ID = req.body[0].MatchGroupID;
 
@@ -156,7 +156,7 @@ module.exports = {
       let matched = await sails.sendNativeQuery('SELECT  *  FROM [NedDev].[dbo].[Account_Match] \n' +
         'where PrimaryProfile != \'\' or MatchGroupID != \'\' \n' +
         'order by MatchGroupID desc', []);
-      console.log('getMatched');
+      //console.log('getMatched');
       return res.json(matched.recordset);
 
     } catch (e) {
@@ -171,7 +171,7 @@ module.exports = {
       let nonMatch = await sails.sendNativeQuery('SELECT  *  FROM [NedDev].[dbo].[Account_Match] \n' +
         'where PrimaryProfile != \'\' or PrimaryProfile IS NULL and MatchGroupID IS NULL \n' +
         'order by PrimaryProfile desc', []);
-      console.log('getNonMatch');
+      //console.log('getNonMatch');
       return res.json(nonMatch.recordset);
 
     } catch (e) {
@@ -186,8 +186,8 @@ module.exports = {
       let noMatch = await sails.sendNativeQuery('SELECT  *  FROM [NedDev].[dbo].[Account_Match] \n' +
         ' where PrimaryProfile = \'\' or MatchGroupID = \'\' and PrimaryProfile IS NULL or MatchGroupID IS NULL \n' +
         'order by PrimaryProfile desc', []);
-      console.log('noMatch.recordset');
-      console.log(noMatch.recordset);
+      //console.log('noMatch.recordset');
+      //console.log(noMatch.recordset);
       return res.json(noMatch.recordset);
 
     } catch (e) {
@@ -201,7 +201,7 @@ module.exports = {
     try {
       let primary = await sails.sendNativeQuery('SELECT  *  FROM [NedDev].[dbo].[Account_Match] \n' +
         ' where PrimaryProfile != \'\'', []);
-      console.log('getPrimary');
+      //console.log('getPrimary');
       return res.json(primary.recordset);
 
     } catch (e) {
@@ -212,12 +212,12 @@ module.exports = {
   },
 
   selectedItemsMerge: async (req, res) => {
-    console.log(req.allParams());
-    console.log(req.param('PrimaryProfile'));
+    //console.log(req.allParams());
+    //console.log(req.param('PrimaryProfile'));
 
     try {
       let query = `SELECT  *  FROM [NedDev].[dbo].[Account_Match] where  MatchGroupID = `;
-      query += req.param('PrimaryProfile')
+      query += req.param('PrimaryProfile');
       //console.log(query);
       let nonMatch = await sails.sendNativeQuery(query, []);
       //console.log(nonMatch);
